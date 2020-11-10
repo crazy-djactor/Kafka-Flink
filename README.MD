@@ -1,25 +1,25 @@
-package com.kafka;
+## Apache Kafka - Flink datastream
 
-import com.kafka.connector.Producer;
-import com.kafka.model.KafkaRecord;
-import com.kafka.operator.Aggregator;
-import com.kafka.schema.DeserializeSchema;
-import org.apache.flink.streaming.api.TimeCharacteristic;
-import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.timestamps.AscendingTimestampExtractor;
-import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringSerializer;
+The data from one kafka topic will be processed and published into another kafka stream.
+For streaming, apache Flink is used.
 
-import java.util.Properties;
-import com.forecast.ForecastConfig;
+- Apache Kafka installation
 
-public class FlinkDataPipeline {
+  https://kafka.apache.org/quickstart
+- Create kafka topics.
 
-    @SuppressWarnings("serial")
+  - bin/kafka-topics.sh --create --topic input_topic --bootstrap-server localhost:9092
+  - bin/kafka-topics.sh --create --topic output_topic --bootstrap-server localhost:9092
+  
+- Project environment
+  - Kafka and flink are using Maven.
+  
+  https://www.jetbrains.com/help/idea/work-with-maven-dependencies.html#generate_maven_dependency
+
+- Structure
+
+The main classes are packed into com.kafka package. Connector, model, operator, schema are for consuming and producing kafka topics and flink jobs.
+
     public static void StartPipeLine() throws Exception {
         Producer<String> p = new Producer<String>(ForecastConfig.BOOTSTRAP_SERVER, StringSerializer.class.getName());
 
@@ -66,7 +66,6 @@ public class FlinkDataPipeline {
             .keyBy(record -> record.key)
             .countWindow(ForecastConfig.Data_Length, ForecastConfig.step)
             .aggregate(new Aggregator())
-//          .filter((value) -> value != null && !value.isEmpty())
             .addSink(kafkaProducer);
 
         // produce a number as string every second
@@ -79,4 +78,7 @@ public class FlinkDataPipeline {
         env.execute();
     }
 
-}
+The core of this stream is setting sliding window for Data_Length.
+Datastream is overlapped and Data_Length number of values are used in Forecast at a time.
+In Aggregator, Data_Length of values in the sliding window at a time should be passed into Forecast method.
+Returned result will be published by .addSink(kafkaProducer)
