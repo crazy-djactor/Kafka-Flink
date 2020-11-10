@@ -18,7 +18,11 @@ For streaming, apache Flink is used.
 
 - Structure
 
-The main classes are packed into com.kafka package. Connector, model, operator, schema are for consuming and producing kafka topics and flink jobs.
+The project entry point is com.kafka.Main
+
+The main classes are packed into com.kafka package. 
+
+Connector, model, operator, schema are for consuming and producing kafka topics and flink jobs.
 
     public static void StartPipeLine() throws Exception {
         Producer<String> p = new Producer<String>(ForecastConfig.BOOTSTRAP_SERVER, StringSerializer.class.getName());
@@ -79,6 +83,9 @@ The main classes are packed into com.kafka package. Connector, model, operator, 
     }
 
 The core of this stream is setting sliding window for Data_Length.
+
 Datastream is overlapped and Data_Length number of values are used in Forecast at a time.
+
 In Aggregator, Data_Length of values in the sliding window at a time should be passed into Forecast method.
+
 Returned result will be published by .addSink(kafkaProducer)
