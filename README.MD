@@ -18,6 +18,22 @@ For streaming, apache Flink is used.
 
 - Structure
 
+  The config in com.forcat.ForecastConfig is used for configuring kafka server and topics.
+    
+    
+    public class ForecastConfig {
+        static public int Data_Length = 3000;
+        static public int step = 1;
+        static public int Pattern_Length = 10;
+        static public int Forecast_horizon = 5;
+        static public float Precision = 0.95f;
+    
+        static public String TOPIC_IN = "Topic1-IN";
+        static public String TOPIC_OUT = "Topic3-OUT";
+        static public String BOOTSTRAP_SERVER = "localhost:9092";
+    
+    }
+    
 The project entry point is com.kafka.Main
 
 The main classes are packed into com.kafka package. 
@@ -86,6 +102,8 @@ The core of this stream is setting sliding window for Data_Length.
 
 Datastream is overlapped and Data_Length number of values are used in Forecast at a time.
 
-In Aggregator, Data_Length of values in the sliding window at a time should be passed into Forecast method.
+In Aggregator, Data_Length of values in the sliding window from Topic_In at a time should be passed into Forecast method.
 
-Returned result will be published by .addSink(kafkaProducer)
+Returned result will be published by .addSink(kafkaProducer) to Topic_OUT.
+
+ 
