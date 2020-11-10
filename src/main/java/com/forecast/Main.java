@@ -1,4 +1,4 @@
-package com.flink;
+package com.forecast;
 
 public class Main {
     public static void main(String[] args) {

@@ -1,7 +1,8 @@
-package com.forecast.connector.operator;
+package com.kafka.operator;
 
-import com.forecast.connector.model.KafkaRecord;
-import com.forecast.connector.model.ForecastRecord;
+import com.forecast.ForecastConfig;
+import com.kafka.model.KafkaRecord;
+import com.kafka.model.ForecastRecord;
 import org.apache.flink.api.common.functions.AggregateFunction;
 
 import java.time.LocalDateTime;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Aggregator implements AggregateFunction<KafkaRecord, List<KafkaRecord>, ForecastRecord> {
+public class Aggregator implements AggregateFunction<KafkaRecord, List<KafkaRecord>, String> {
     @Override
     public List<KafkaRecord> createAccumulator() {
         return new ArrayList<>();
@@ -22,8 +23,13 @@ public class Aggregator implements AggregateFunction<KafkaRecord, List<KafkaReco
     }
 
     @Override
-    public ForecastRecord getResult(List<KafkaRecord> inputMessages) {
-        return new ForecastRecord(inputMessages, LocalDateTime.now());
+    public String getResult(List<KafkaRecord> inputMessages) {
+        if (inputMessages.size() == 3000){
+            ForecastRecord result = new ForecastRecord(inputMessages, LocalDateTime.now());
+            System.out.println(result.getValue());
+            return result.getValue();
+        }
+        return "";
     }
 
     @Override

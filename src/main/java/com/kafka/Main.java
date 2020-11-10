@@ -1,11 +1,13 @@
-package com.forecast.connector;
+package com.kafka;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Properties;
 
-import com.forecast.connector.model.KafkaRecord;
-import com.forecast.connector.schema.DeserializeSchema;
+import com.forecast.ForecastConfig;
+import com.kafka.connector.Producer;
+import com.kafka.model.KafkaRecord;
+import com.kafka.operator.Aggregator;
+import com.kafka.schema.DeserializeSchema;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -19,7 +21,8 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
-import java.util.List;
+import static com.kafka.FlinkDataPipeline.StartPipeLine;
+
 
 public class Main
 {
@@ -51,16 +54,16 @@ public class Main
 
         Properties prodProps = new Properties();
         prodProps.put("bootstrap.servers", BOOTSTRAP_SERVER);
-        FlinkKafkaProducer<KafkaRecord> kafkaProducer =
-                new FlinkKafkaProducer<KafkaRecord>(TOPIC_OUT,
-                        ((value, timestamp) -> new ProducerRecord<byte[], byte[]>(TOPIC_OUT, "myKey".getBytes(),
-                                value.value.getBytes())),
+        FlinkKafkaProducer<String> kafkaProducer =
+                new FlinkKafkaProducer<String>(ForecastConfig.TOPIC_OUT,
+                        ((value, timestamp) -> new ProducerRecord<byte[], byte[]>(ForecastConfig.TOPIC_OUT,
+                                "myKey".getBytes(), value.getBytes())),
                         prodProps,
                         FlinkKafkaProducer.Semantic.EXACTLY_ONCE);
 
-        kafkaConsumer.setStartFromLatest();
+        kafkaConsumer.setStartFromEarliest();
 
-        Data_Length = 3000;
+        Data_Length = 5;
         step = 1;
         Pattern_Length = 10;
         Forecast_horizon = 5;
@@ -71,21 +74,22 @@ public class Main
 
         // supports timewindow without group by key
         stream
-                .countWindowAll(Data_Length)
-                .reduce(new ReduceFunction<KafkaRecord>()
-                {
-                    KafkaRecord result = new KafkaRecord();
-
-                    @Override
-                    public KafkaRecord reduce(KafkaRecord record1, KafkaRecord record2) throws Exception
-                    {
-                        System.out.println(LocalTime.now() + " -> " + record1 + "   " + record2);
-                        result.key = record1.key;
-                        result.value = record1.value + record2.value;
-                        return result;
-                    }
-                }).addSink(kafkaProducer);
-//                .print(); // immediate printing to console
+                .countWindowAll(10, 1)
+                .aggregate(new Aggregator())
+                .addSink(kafkaProducer);
+//                .reduce(new ReduceFunction<KafkaRecord>()
+//                {
+//                    KafkaRecord result = new KafkaRecord();
+//
+//                    @Override
+//                    public KafkaRecord reduce(KafkaRecord record1, KafkaRecord record2) throws Exception
+//                    {
+//                        System.out.println(LocalTime.now() + " -> " + record1 + "   " + record2);
+//                        result.key = record1.key;
+//                        result.value = record1.value + " " + record2.value;
+//                        return result;
+//                    }
+//                }).addSink(kafkaProducer); // immediate printing to console
 
 
         //.keyBy( (KeySelector<KafkaRecord, String>) KafkaRecord::getKey )
@@ -241,8 +245,8 @@ public class Main
         env.execute();
     }
 
-    public static void main( String[] args )
-    {
-
+    public static void main( String[] args ) throws Exception {
+//        Main.Test1();
+        StartPipeLine();
     }
 }

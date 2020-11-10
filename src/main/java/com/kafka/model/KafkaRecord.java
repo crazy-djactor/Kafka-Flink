@@ -1,4 +1,4 @@
-package com.forecast.connector.model;
+package com.kafka.model;
 
 import java.io.Serializable;
 

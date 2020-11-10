@@ -1,6 +1,6 @@
-package com.forecast.connector.schema;
+package com.kafka.schema;
 
-import com.forecast.connector.model.KafkaRecord;
+import com.kafka.model.KafkaRecord;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.connectors.kafka.KafkaDeserializationSchema;
 import org.apache.kafka.clients.consumer.ConsumerRecord;

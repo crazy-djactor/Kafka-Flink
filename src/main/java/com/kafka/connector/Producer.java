@@ -1,4 +1,4 @@
-package com.forecast.connector;
+package com.kafka.connector;
 
 import java.util.Properties;
 import org.apache.kafka.clients.producer.KafkaProducer;

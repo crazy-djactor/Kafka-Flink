@@ -1,4 +1,4 @@
-package com.flink;
+package com.forecast;
 
 import java.io.*;
 import java.net.URL;
