@@ -8,6 +8,7 @@ import com.kafka.connector.Producer;
 import com.kafka.model.KafkaRecord;
 import com.kafka.operator.Aggregator;
 import com.kafka.schema.DeserializeSchema;
+
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -20,6 +21,8 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
+
+import org.apache.commons.cli.*;
 
 import static com.kafka.FlinkDataPipeline.StartPipeLine;
 
@@ -153,7 +156,7 @@ public class Main
                 .addSink(kafkaProducer);
 
         // produce a number as string every second
-        new TestGenerator(p, TOPIC_IN).start();
+//        new TestGenerator(p, TOPIC_IN).start();
 
         // for visual topology of the pipeline. Paste the below output in https://flink.apache.org/visualizer/
         System.out.println( env.getExecutionPlan() );
@@ -247,93 +250,91 @@ public class Main
 
     public static void main( String[] args ) throws Exception {
 //        Main.Test1();
-        StartPipeLine();
-        return;
 
-//        Options options = new Options();
-//        Option input = new Option("i", "input", true, "The Kafka topic name for input");
-//        input.setRequired(true);
-//        options.addOption(input);
-//        Option output = new Option("o", "output", true, "The Kafka topic name for output");
-//        output.setRequired(true);
-//        options.addOption(output);
-//
-//        Option data_length = new Option("length", "data_length", true, "DataLength for forecasting, default value is 3000");
-//        data_length.setRequired(false);
-//        options.addOption(data_length);
-//        Option step = new Option("step", "step", true, "Step value for forecasting, default value is 1");
-//        step.setRequired(false);
-//        options.addOption(step);
-//        Option patternLength = new Option("pl", "pattern_length", true, "Pattern Length for forecasting, default value is 10");
-//        data_length.setRequired(false);
-//        options.addOption(patternLength);
-//        Option forecast = new Option("fh", "forcast_horizon", true, "Horizon value for forecasting, default value is 5");
-//        forecast.setRequired(false);
-//        options.addOption(forecast);
-//        Option precision = new Option("pr", "precision", true, "Precision value for forecasting, default value is 0.95f");
-//        forecast.setRequired(false);
-//        options.addOption(precision);
-//
-//        Option bootstrap = new Option("bst", "bootstrap-server", true, "Bootstrap server for kafka, default value is localhost:9092");
-//        forecast.setRequired(false);
-//        options.addOption(bootstrap);
-//
-//        CommandLineParser parser = new DefaultParser();
-//        HelpFormatter formatter = new HelpFormatter();
-//        CommandLine cmd;
-//
-//        try {
-//            cmd = parser.parse(options, args);
-//            String inputTopic = cmd.getOptionValue("input");
-//            String outputTopic = cmd.getOptionValue("output");
-//            String DataLength = cmd.getOptionValue("data_length");
-//            String Step = cmd.getOptionValue("step");
-//
-//            String Precision = cmd.getOptionValue("precision");
-//            String PatternLength = cmd.getOptionValue("pattern_length");
-//            String Forecast_Horizon = cmd.getOptionValue("forcast_horizon");
-//            String BootstrapServer = cmd.getOptionValue("bootstrap-server");
-//
-//            ForecastConfig.TOPIC_IN = inputTopic;
-//            ForecastConfig.TOPIC_OUT = inputTopic;
-//
-//            if (DataLength != null) {
-//                ForecastConfig.Data_Length = Integer.parseInt(DataLength);
-//            }
-//            if (Forecast_Horizon != null) {
-//                ForecastConfig.Forecast_horizon = Integer.parseInt(Forecast_Horizon);
-//            }
-//
-//            if (PatternLength != null) {
-//                ForecastConfig.Pattern_Length = Integer.parseInt(PatternLength);
-//            }
-//
-//            if (Step != null) {
-//                ForecastConfig.step = Integer.parseInt(Step);
-//            }
-//
-//            if (Precision != null) {
-//                ForecastConfig.Precision = Float.parseFloat(Precision);
-//            }
-//
-//            if (BootstrapServer != null) {
-//                ForecastConfig.BOOTSTRAP_SERVER = BootstrapServer;
-//            }
-//
-//            String outputString = String.format("Forecasting from Topic %s to %s with (DataLength: %d, Forecast_Horizon: %d, PatternLength: %d, Step: %d, Precision: %.2f",
-//                    inputTopic, outputTopic,
-//                    ForecastConfig.Data_Length,
-//                    ForecastConfig.Forecast_horizon,
-//                    ForecastConfig.Pattern_Length,
-//                    ForecastConfig.step,
-//                    ForecastConfig.Precision);
-//            System.out.println(outputString);
-//            StartPipeLine();
-//        } catch (ParseException e) {
-//            System.out.println(e.getMessage());
-//            formatter.printHelp("utility-name", options);
-//            System.exit(1);
-//        }
+        Options options = new Options();
+        Option input = new Option("i", "input", true, "The Kafka topic name for input");
+        input.setRequired(true);
+        options.addOption(input);
+        Option output = new Option("o", "output", true, "The Kafka topic name for output");
+        output.setRequired(true);
+        options.addOption(output);
+
+        Option data_length = new Option("length", "data_length", true, "DataLength for forecasting, default value is 3000");
+        data_length.setRequired(false);
+        options.addOption(data_length);
+        Option step = new Option("step", "step", true, "Step value for forecasting, default value is 1");
+        step.setRequired(false);
+        options.addOption(step);
+        Option patternLength = new Option("pl", "pattern_length", true, "Pattern Length for forecasting, default value is 10");
+        data_length.setRequired(false);
+        options.addOption(patternLength);
+        Option forecast = new Option("fh", "forcast_horizon", true, "Horizon value for forecasting, default value is 5");
+        forecast.setRequired(false);
+        options.addOption(forecast);
+        Option precision = new Option("pr", "precision", true, "Precision value for forecasting, default value is 0.95f");
+        forecast.setRequired(false);
+        options.addOption(precision);
+
+        Option bootstrap = new Option("bst", "bootstrap-server", true, "Bootstrap server for kafka, default value is localhost:9092");
+        forecast.setRequired(false);
+        options.addOption(bootstrap);
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd;
+
+        try {
+            cmd = parser.parse(options, args);
+            String inputTopic = cmd.getOptionValue("input");
+            String outputTopic = cmd.getOptionValue("output");
+            String DataLength = cmd.getOptionValue("data_length");
+            String Step = cmd.getOptionValue("step");
+
+            String Precision = cmd.getOptionValue("precision");
+            String PatternLength = cmd.getOptionValue("pattern_length");
+            String Forecast_Horizon = cmd.getOptionValue("forcast_horizon");
+            String BootstrapServer = cmd.getOptionValue("bootstrap-server");
+
+            ForecastConfig.TOPIC_IN = inputTopic;
+            ForecastConfig.TOPIC_OUT = inputTopic;
+
+            if (DataLength != null) {
+                ForecastConfig.Data_Length = Integer.parseInt(DataLength);
+            }
+            if (Forecast_Horizon != null) {
+                ForecastConfig.Forecast_horizon = Integer.parseInt(Forecast_Horizon);
+            }
+
+            if (PatternLength != null) {
+                ForecastConfig.Pattern_Length = Integer.parseInt(PatternLength);
+            }
+
+            if (Step != null) {
+                ForecastConfig.step = Integer.parseInt(Step);
+            }
+
+            if (Precision != null) {
+                ForecastConfig.Precision = Float.parseFloat(Precision);
+            }
+
+            if (BootstrapServer != null) {
+                ForecastConfig.BOOTSTRAP_SERVER = BootstrapServer;
+            }
+
+            String outputString = String.format("Forecasting from Topic %s to %s with (DataLength: %d, Forecast_Horizon: %d, PatternLength: %d, Step: %d, Precision: %.2f",
+                    inputTopic, outputTopic,
+                    ForecastConfig.Data_Length,
+                    ForecastConfig.Forecast_horizon,
+                    ForecastConfig.Pattern_Length,
+                    ForecastConfig.step,
+                    ForecastConfig.Precision);
+            System.out.println(outputString);
+            StartPipeLine();
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("utility-name", options);
+            System.exit(1);
+        }
 
     }
 }

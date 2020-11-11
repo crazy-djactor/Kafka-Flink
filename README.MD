@@ -97,7 +97,9 @@ Connector, model, operator, schema are for consuming and producing kafka topics 
         // start flink
         env.execute();
     }
-
+- Run
+  https://ci.apache.org/projects/flink/flink-docs-release-1.11/try-flink/local_installation.html
+  
 The core of this stream is setting sliding window for Data_Length.
 
 Datastream is overlapped and Data_Length number of values are used in Forecast at a time.

@@ -70,7 +70,7 @@ public class FlinkDataPipeline {
             .addSink(kafkaProducer);
 
         // produce a number as string every second
-        new TestGenerator(p, ForecastConfig.TOPIC_IN).start();
+//        new TestGenerator(p, ForecastConfig.TOPIC_IN).start();
 
         // for visual topology of the pipeline. Paste the below output in https://flink.apache.org/visualizer/
         System.out.println( env.getExecutionPlan() );
