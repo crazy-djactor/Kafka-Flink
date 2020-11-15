@@ -25,9 +25,10 @@ public class TestForecast {
     public void Test() {
         URL location = ForecastPattern.class.getProtectionDomain().getCodeSource().getLocation();
         System.out.println(location.getFile());
+
         final String dir = System.getProperty("user.dir");
         System.out.println("current dir = " + dir);
-        String inputFile = dir + "/data.txt";
+        String inputFile = dir + "/data_JSON.txt";
         List<String> l_ArrAll = new ArrayList<String>();
         try (Stream<String> lines = Files.lines(Paths.get(inputFile))) {
             lines.forEach(l_ArrAll::add);
@@ -36,13 +37,14 @@ public class TestForecast {
             System.out.println(e);
         }
         String l_Result = null;
-        for(int i = 0; i < l_ArrAll.size() - Data_Length; i = i + Step) {
-            List<String> l_ArrPart = new ArrayList<String>();
-            for(int i2 = 0; i2 < Data_Length; i2 = i2 + 1) {
-                l_ArrPart.add(l_ArrAll.get(i + i2));
+        String l_Value = null;
+        for(int i = 0; i < l_ArrAll.size(); i = i + Step) {
+            l_Value = l_ArrAll.get(i);
+            l_Result = ForecastPattern.Forecast(l_Value, Data_Length, Pattern_Length, Forecast_horizon, Precision);
+            if (i >= 3000) {
+                System.out.println(l_Result);
             }
-            l_Result = ForecastPattern.Forecast(l_ArrPart, Pattern_Length, Forecast_horizon, Precision);
-            System.out.println(l_Result);
+
         }
     }
 }

@@ -250,6 +250,7 @@ public class Main
 
     public static void main( String[] args ) throws Exception {
 //        Main.Test1();
+        StartPipeLine();
 
         Options options = new Options();
         Option input = new Option("i", "input", true, "The Kafka topic name for input");

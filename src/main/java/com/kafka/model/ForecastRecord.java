@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.forecast.ForecastConfig;
 import com.forecast.ForecastPattern;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +28,24 @@ public class ForecastRecord {
         List<String> valueArray = new ArrayList<String>();
 
         for (KafkaRecord record : inputMessages) {
-            valueArray.add(record.value);
+            try {
+                JSONObject jsonObject = new JSONObject(record.value);
+                String Price = (String)jsonObject.get("price");
+                if (Price.equals("")) {
+                    continue;
+                }
+                valueArray.add(Price);
+            } catch (JSONException ignored){
+            }
         }
+
+        this.value = ForecastPattern.CoreForest(valueArray,
+                ForecastConfig.Pattern_Length,
+                ForecastConfig.Forecast_horizon,
+                ForecastConfig.Precision);
+
 //        this.value = ForecastPattern.Forecast(valueArray, ForecastConfig.Pattern_Length,
 //                ForecastConfig.Forecast_horizon, ForecastConfig.Precision);
-        this.value = ForecastPattern.Forecast(valueArray, ForecastConfig.Pattern_Length,
-                ForecastConfig.Forecast_horizon, ForecastConfig.Precision);
     }
 
     public List<KafkaRecord> getInputMessages() {

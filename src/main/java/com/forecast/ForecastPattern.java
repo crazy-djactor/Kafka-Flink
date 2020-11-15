@@ -1,12 +1,18 @@
 package com.forecast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import java.text.DecimalFormat;
 import java.util.*;
 
 public class ForecastPattern {
-    static List<String> Data = null;
-    public static String Forecast(List<String> l_Values, int l_PatternLength, int l_Horizon, float Precision) {
+    static List<String> static_Data = null;
+    static long HistorySize = 0;
+
+    public static String Forecast(String l_Value, long l_HistoryLength, long l_PatternLength, long l_Horizon, double Precision) {
         int i;
-        if (l_Values.size() <= 0) {
+        String Price = null;
+        if (l_Value.equals("")) {
             return "No Input Data";
         }
         if (l_PatternLength < 2) {
@@ -18,76 +24,97 @@ public class ForecastPattern {
         if (Precision < 0 || Precision > 1) {
             return "Precision needs to be between 0 and 1";
         }
-        if (Data == null) {
-            Data = new ArrayList<String>(l_Values);
-        }
-        else {
-            int n_OriginSize = Data.size();
-            if (n_OriginSize < l_Values.size()) {
-                Data = new ArrayList<String>(l_Values);
+
+        if (HistorySize == 0) {
+            if (l_HistoryLength <= 0) {
+                return "HistoryLength must be bigger than 0";
             } else {
-                for (i = 0; i < n_OriginSize - l_Values.size(); i++) {
-                    Data.set(i, Data.get(i + l_Values.size()));
-                }
-                for (i = n_OriginSize - l_Values.size(); i < n_OriginSize; i++) {
-                    Data.set(i, l_Values.get(i - n_OriginSize + l_Values.size()));
-                }
+                HistorySize = l_HistoryLength;
             }
         }
+
+        try {
+            JSONObject jsonObject = new JSONObject(l_Value);
+            Price = (String)jsonObject.get("price");
+            if (Price.equals("")) {
+                return "No price data";
+            }
+        } catch (JSONException err){
+            return err.getMessage();
+        }
+        if (static_Data == null) {
+            static_Data = new ArrayList<String>();
+            static_Data.add(Price);
+        }
+        else {
+            int last_index = static_Data.size();
+            if (static_Data.size() < HistorySize) {
+                static_Data.add(Price);
+            }
+            else {
+                for (i = 0; i < last_index - 1; i++)
+                    static_Data.set(i, static_Data.get(i + 1));
+                static_Data.set(last_index - 1, Price);
+            }
+        }
+        return CoreForest(static_Data, l_PatternLength, l_Horizon, Precision);
+    }
+
+    public static String CoreForest(List<String> Data, long l_PatternLength, long l_Horizon, double Precision) {
         int UBoundData = Data.size() - 1;
+        int i;
         String[] arrayData = Data.toArray(new String[UBoundData + 1]);
 
         float[] Pattern;
         Pattern = new float[(int)l_PatternLength];
         int UBoundPattern = Pattern.length - 1;
-
-        for (i = 0; i < l_PatternLength; i ++) {
-            Pattern[i] = Float.parseFloat(arrayData[UBoundData - UBoundPattern + i]);
-        }
-
-        float AvgChgPositive = 0.0f, AvgChgNegative = 0.0f;
-        int NoOfNoChange = 0, NoOfPositives = 0, NoOfNegatives = 0, NoOfAll;
-
-        for (i = 0; i <= UBoundData - l_PatternLength - l_Horizon; i ++) {
-            float[] DataPart = new float[UBoundPattern + 1];
-            for (int i2 = 0; i2 <= UBoundPattern; i2 ++) {
-                DataPart[i2] = Float.parseFloat(arrayData[i + i2]);
+        if (! arrayData[0].equals("") && UBoundData > UBoundPattern) {
+            for (i = 0; i < l_PatternLength; i++) {
+                Pattern[i] = Float.parseFloat(arrayData[UBoundData - UBoundPattern + i]);
             }
-            double Correlation = PearsonCorrelation(DataPart, Pattern);
-            if (Correlation >= Precision) {
-                if (Float.parseFloat(arrayData[i + UBoundPattern + l_Horizon]) > Float.parseFloat(arrayData[i + UBoundPattern])) {
-                    NoOfPositives = NoOfPositives + 1;
-                    AvgChgPositive = AvgChgPositive +
-                            ((Float.parseFloat(arrayData[i + UBoundPattern + l_Horizon])/Float.parseFloat(arrayData[i + UBoundPattern])) - 1) * 100;
+
+            float AvgChgPositive = 0.0f, AvgChgNegative = 0.0f;
+            int NoOfNoChange = 0, NoOfPositives = 0, NoOfNegatives = 0, NoOfAll;
+
+            for (i = 0; i <= UBoundData - l_PatternLength - l_Horizon; i++) {
+                float[] DataPart = new float[UBoundPattern + 1];
+                for (int i2 = 0; i2 <= UBoundPattern; i2++) {
+                    DataPart[i2] = Float.parseFloat(arrayData[i + i2]);
                 }
-                else if (Float.parseFloat(arrayData[i + UBoundPattern + l_Horizon]) < Float.parseFloat(arrayData[i + UBoundPattern])) {
-                    NoOfNegatives = NoOfNegatives + 1;
-                    AvgChgNegative = AvgChgNegative +
-                            (1 - Float.parseFloat(arrayData[i + UBoundPattern + l_Horizon])/Float.parseFloat(arrayData[i + UBoundPattern])) * 100;
-                }
-                else {
-                    NoOfNoChange = NoOfNoChange + 1;
+                double Correlation = PearsonCorrelation(DataPart, Pattern);
+                if (Correlation >= Precision) {
+                    if (Float.parseFloat(arrayData[(int) (i + UBoundPattern + l_Horizon)]) > Float.parseFloat(arrayData[i + UBoundPattern])) {
+                        NoOfPositives = NoOfPositives + 1;
+                        AvgChgPositive = AvgChgPositive +
+                                ((Float.parseFloat(arrayData[(int) (i + UBoundPattern + l_Horizon)]) / Float.parseFloat(arrayData[i + UBoundPattern])) - 1) * 100;
+                    } else if (Float.parseFloat(arrayData[(int) (i + UBoundPattern + l_Horizon)]) < Float.parseFloat(arrayData[i + UBoundPattern])) {
+                        NoOfNegatives = NoOfNegatives + 1;
+                        AvgChgNegative = AvgChgNegative +
+                                (1 - Float.parseFloat(arrayData[(int) (i + UBoundPattern + l_Horizon)]) / Float.parseFloat(arrayData[i + UBoundPattern])) * 100;
+                    } else {
+                        NoOfNoChange = NoOfNoChange + 1;
+                    }
                 }
             }
-        }
+            if (NoOfPositives > 0) {
+                AvgChgPositive = AvgChgPositive / NoOfPositives;
+            }
+            if (NoOfNegatives > 0) {
+                AvgChgNegative = AvgChgNegative / NoOfNegatives;
+            }
+            NoOfAll = NoOfPositives + NoOfNegatives + NoOfNoChange;
 
-        if (NoOfPositives > 0) {
-            AvgChgPositive = AvgChgPositive / NoOfPositives;
+            DecimalFormat df2 = new DecimalFormat("0.00");
+            DecimalFormat df4 = new DecimalFormat("0.0000");
+            if (NoOfAll == 0)
+                return "";
+            return String.format("%d; %s; %s; %s; %s", NoOfAll,
+                    df2.format((float) (NoOfPositives) / NoOfAll * 100),
+                    df2.format((float) (NoOfNegatives) / NoOfAll * 100),
+                    df4.format(AvgChgPositive),
+                    df4.format(AvgChgNegative));
         }
-        if (NoOfNegatives > 0) {
-            AvgChgNegative = AvgChgNegative / NoOfNegatives;
-        }
-        NoOfAll = NoOfPositives + NoOfNegatives + NoOfNoChange;
-
-        DecimalFormat df2 = new DecimalFormat("0.00");
-        DecimalFormat df4 = new DecimalFormat("0.0000");
-        if (NoOfAll == 0)
-            return "";
-        return String.format("%d; %s; %s; %s; %s", NoOfAll,
-                df2.format((float)(NoOfPositives)/NoOfAll*100),
-                df2.format((float)(NoOfNegatives)/NoOfAll*100),
-                df4.format(AvgChgPositive),
-                df4.format(AvgChgNegative));
+        return "";
     }
 
     public static double PearsonCorrelation(float[] X, float[] Y) {
@@ -124,4 +151,5 @@ public class ForecastPattern {
         }
         return Result;
     }
+
 }

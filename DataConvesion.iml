@@ -11,6 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.json:json:20200518" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-streaming-java_2.12:1.11.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-runtime_2.12:1.11.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-queryable-state-client-java:1.11.2" level="project" />

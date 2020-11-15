@@ -24,7 +24,7 @@ public class TestGenerator extends Thread {
 
         final String dir = System.getProperty("user.dir");
         System.out.println("current dir = " + dir);
-        String inputFile = dir + "/data.txt";
+        String inputFile = dir + "/data_JSON.txt";
         List<String> l_ArrAll = new ArrayList<String>();
         try (Stream<String> lines = Files.lines(Paths.get(inputFile))) {
             lines.forEach(l_ArrAll::add);

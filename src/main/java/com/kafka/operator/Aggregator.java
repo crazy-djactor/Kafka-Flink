@@ -1,6 +1,7 @@
 package com.kafka.operator;
 
 import com.forecast.ForecastConfig;
+import com.forecast.ForecastPattern;
 import com.kafka.model.KafkaRecord;
 import com.kafka.model.ForecastRecord;
 import org.apache.flink.api.common.functions.AggregateFunction;
@@ -24,7 +25,7 @@ public class Aggregator implements AggregateFunction<KafkaRecord, List<KafkaReco
 
     @Override
     public String getResult(List<KafkaRecord> inputMessages) {
-        if (inputMessages.size() == 3000){
+        if (inputMessages.size() == ForecastConfig.Data_Length){
             ForecastRecord result = new ForecastRecord(inputMessages, LocalDateTime.now());
             System.out.println(result.getValue());
             return result.getValue();
