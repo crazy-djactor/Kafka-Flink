@@ -108,4 +108,55 @@ In Aggregator, Data_Length of values in the sliding window from Topic_In at a ti
 
 Returned result will be published by .addSink(kafkaProducer) to Topic_OUT.
 
+
+======================================
+
+### Example Run configuration
+
+This configuration is processing json inputs from Topic1-IN and process, write outputs to Topic3-OUT.
+
+1) Run zookeeper, kafka server and create topics for input, output (In the kafka installation directory)
+ 
+  - bin/zookeeper-server-start.sh config/zookeeper.properties
+  - bin/kafka-server-start.sh config/server.properties
+  - bin/kafka-topics.sh --create --topic Topic1-IN --bootstrap-server localhost:9092
+  - bin/kafka-topics.sh --create --topic Topic3-OUT --bootstrap-server localhost:9092
+  
+2) Start flink cluster (In the flink binary directory) 
+  - ./bin/start-cluster.sh
+  - ./bin/flink run /WORK/Java/DataConvesion.jar -i Topic1-IN -o Topic3-OUT -bst localhost:9092 -test /WORK/Java/data_JSON.txt
+    
+    Params are here in details.
+    
+    
+     -bst,--bootstrap-server <arg>   Bootstrap server for kafka, default value
+                                     is localhost:9092
+                                     
+     -fh,--forcast_horizon <arg>     Horizon value for forecasting, default
+                                     value is 5
+                                     
+     -i,--input <arg>                The Kafka topic name for input
+     
+     -length,--data_length <arg>     DataLength for forecasting, default value
+                                     is 3000
+                                     
+     -o,--output <arg>               The Kafka topic name for output
+     
+     -pl,--pattern_length <arg>      Pattern Length for forecasting, default
+                                     value is 10
+                                     
+     -pr,--precision <arg>           Precision value for forecasting, default
+                                     value is 0.95f
+                                     
+     -step,--step <arg>              Step value for forecasting, default value
+                                     is 1
+                                     
+     -test,--test <arg>              Test data for test running, ex:
+                                     C:/data_JSON.txt
+
+
+ To check output for kafka topic, let's run console consumer of output topic.
+  
+  - bin/kafka-console-consumer.sh --topic Topic3-OUT --from-beginning --bootstrap-server localhost:9092
+ 
  
