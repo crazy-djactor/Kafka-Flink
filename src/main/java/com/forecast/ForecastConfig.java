@@ -10,5 +10,5 @@ public class ForecastConfig {
     static public String TOPIC_IN = "Topic1-IN";
     static public String TOPIC_OUT = "Topic3-OUT";
     static public String BOOTSTRAP_SERVER = "localhost:9092";
-
+    static public String Test = "";
 }

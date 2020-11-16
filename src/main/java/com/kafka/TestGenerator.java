@@ -13,20 +13,21 @@ public class TestGenerator extends Thread {
     int counter = 0;
     Producer<String> p;
     final String topic;
+    final String test;
 
-    public TestGenerator(Producer<String> p, String topic) {
+    public TestGenerator(Producer<String> p, String topic, String test) {
         this.p = p;
         this.topic = topic;
+        this.test = test;
     }
 
     @Override
     public void run() {
 
         final String dir = System.getProperty("user.dir");
-        System.out.println("current dir = " + dir);
-        String inputFile = dir + "/data_JSON.txt";
+        System.out.println("input dir = " + this.test);
         List<String> l_ArrAll = new ArrayList<String>();
-        try (Stream<String> lines = Files.lines(Paths.get(inputFile))) {
+        try (Stream<String> lines = Files.lines(Paths.get(this.test))) {
             lines.forEach(l_ArrAll::add);
         } catch (IOException e) {
             System.out.println(e);

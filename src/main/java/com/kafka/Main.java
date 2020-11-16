@@ -99,7 +99,7 @@ public class Main
         //.timeWindow(Time.seconds(5))
 
         // produce a number as string every second
-        new TestGenerator(p, TOPIC_IN).start();
+        new TestGenerator(p, TOPIC_IN, "/media/djactor/d0e07426-1a67-4ab9-937f-f4da35c51c14/WORK/Java/Kafka-Flink/data_JSON.txt").start();
 
         // for visual topology of the pipeline. Paste the below output in https://flink.apache.org/visualizer/
         System.out.println( env.getExecutionPlan() );
@@ -156,7 +156,7 @@ public class Main
                 .addSink(kafkaProducer);
 
         // produce a number as string every second
-//        new TestGenerator(p, TOPIC_IN).start();
+//        new TestGenerator(p, TOPIC_IN, "/media/djactor/d0e07426-1a67-4ab9-937f-f4da35c51c14/WORK/Java/Kafka-Flink/data_JSON.txt").start();
 
         // for visual topology of the pipeline. Paste the below output in https://flink.apache.org/visualizer/
         System.out.println( env.getExecutionPlan() );
@@ -239,7 +239,7 @@ public class Main
                 .addSink(kafkaProducer);
 
         // produce a number as string every second
-        new TestGenerator(p, TOPIC_IN).start();
+        new TestGenerator(p, TOPIC_IN, "/media/djactor/d0e07426-1a67-4ab9-937f-f4da35c51c14/WORK/Java/Kafka-Flink/data_JSON.txt").start();
 
         // for visual topology of the pipeline. Paste the below output in https://flink.apache.org/visualizer/
         System.out.println( env.getExecutionPlan() );
@@ -249,8 +249,8 @@ public class Main
     }
 
     public static void main( String[] args ) throws Exception {
-//        Main.Test1();
-        StartPipeLine();
+//        ForecastConfig.Test = "/media/djactor/d0e07426-1a67-4ab9-937f-f4da35c51c14/WORK/Java/DataConvesion/data_JSON.txt";
+//        StartPipeLine();
 
         Options options = new Options();
         Option input = new Option("i", "input", true, "The Kafka topic name for input");
@@ -280,6 +280,10 @@ public class Main
         forecast.setRequired(false);
         options.addOption(bootstrap);
 
+        Option test = new Option("test", "test", true, "Test data for test running, ex: C:/data_JSON.txt");
+        forecast.setRequired(false);
+        options.addOption(test);
+
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd;
@@ -295,9 +299,10 @@ public class Main
             String PatternLength = cmd.getOptionValue("pattern_length");
             String Forecast_Horizon = cmd.getOptionValue("forcast_horizon");
             String BootstrapServer = cmd.getOptionValue("bootstrap-server");
+            String Test = cmd.getOptionValue("test");
 
             ForecastConfig.TOPIC_IN = inputTopic;
-            ForecastConfig.TOPIC_OUT = inputTopic;
+            ForecastConfig.TOPIC_OUT = outputTopic;
 
             if (DataLength != null) {
                 ForecastConfig.Data_Length = Integer.parseInt(DataLength);
@@ -320,6 +325,10 @@ public class Main
 
             if (BootstrapServer != null) {
                 ForecastConfig.BOOTSTRAP_SERVER = BootstrapServer;
+            }
+
+            if (Test != null) {
+                ForecastConfig.Test = Test;
             }
 
             String outputString = String.format("Forecasting from Topic %s to %s with (DataLength: %d, Forecast_Horizon: %d, PatternLength: %d, Step: %d, Precision: %.2f",

@@ -54,11 +54,10 @@ public class FlinkDataPipeline {
 
         FlinkKafkaProducer<String> kafkaProducer =
                 new FlinkKafkaProducer<String>(ForecastConfig.TOPIC_OUT,
-                        ((value, timestamp) -> {
-                            System.out.println("Producer " + value);
-                            return new ProducerRecord<byte[], byte[]>(ForecastConfig.TOPIC_OUT, "myKey".getBytes(),
-                                    value.getBytes());
-                            }),
+                        ((value, timestamp) ->
+                             new ProducerRecord<byte[], byte[]>(ForecastConfig.TOPIC_OUT, "myKey".getBytes(),
+                                    value.getBytes())
+                            ),
                         prodProps,
                         FlinkKafkaProducer.Semantic.EXACTLY_ONCE);
 
@@ -73,7 +72,10 @@ public class FlinkDataPipeline {
             .addSink(kafkaProducer);
 
         // produce a number as string every second
-        new TestGenerator(p, ForecastConfig.TOPIC_IN).start();
+        if (!ForecastConfig.Test.equals("")) {
+            new TestGenerator(p, ForecastConfig.TOPIC_IN, ForecastConfig.Test).start();
+        }
+
 
         // for visual topology of the pipeline. Paste the below output in https://flink.apache.org/visualizer/
         System.out.println( env.getExecutionPlan() );
