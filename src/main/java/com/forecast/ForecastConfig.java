@@ -2,6 +2,7 @@ package com.forecast;
 
 public class ForecastConfig {
     static public int Data_Length = 3000;
+    static public int OutDataLength = 3000;
     static public int step = 1;
     static public int Pattern_Length = 10;
     static public int Forecast_horizon = 5;

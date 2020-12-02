@@ -66,7 +66,7 @@ public class FlinkDataPipeline {
 
         stream.filter((record) -> record.value != null && !record.value.isEmpty())
             .keyBy(record -> record.key)
-            .countWindow(ForecastConfig.Data_Length, ForecastConfig.step)
+            .countWindow(ForecastConfig.OutDataLength, ForecastConfig.step)
             .aggregate(new Aggregator())
             .filter((value) -> value != null && !value.isEmpty())
             .addSink(kafkaProducer);

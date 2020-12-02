@@ -16,9 +16,14 @@ public class DeserializeSchema implements KafkaDeserializationSchema<KafkaRecord
     @Override
     public KafkaRecord deserialize(ConsumerRecord<byte[], byte[]> record) throws Exception {
         KafkaRecord data = new KafkaRecord();
-        data.key =  new String(record.key());
-        data.value = new String(record.value());
-        data.timestamp = record.timestamp();
+        try {
+            data.key =  new String(record.key());
+            data.value = new String(record.value());
+            System.out.println("deserialize == " + data.key + " " + data.value);
+
+            data.timestamp = record.timestamp();
+        } catch (Exception e){
+        }
 
         return data;
     }
