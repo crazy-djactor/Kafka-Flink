@@ -250,8 +250,8 @@ public class Main
     }
 
     public static void main( String[] args ) throws Exception {
-        ForecastConfig.Test = "/media/djactor/d0e07426-1a67-4ab9-937f-f4da35c51c14/WORK/Java/DataConvesion/level1.txt";
-        StartPipeLine();
+//        ForecastConfig.Test = "/media/djactor/d0e07426-1a67-4ab9-937f-f4da35c51c14/WORK/Java/DataConvesion/level1.txt";
+//        StartPipeLine();
 
         Options options = new Options();
         Option input = new Option("i", "input", true, "The Kafka topic name for input");
