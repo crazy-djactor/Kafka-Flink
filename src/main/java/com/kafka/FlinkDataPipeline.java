@@ -24,6 +24,7 @@ public class FlinkDataPipeline {
         Producer<String> p = new Producer<String>(ForecastConfig.BOOTSTRAP_SERVER, StringSerializer.class.getName());
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        // produce a number as string every second
 
         // to use allowed lateness
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
@@ -42,6 +43,9 @@ public class FlinkDataPipeline {
             @Override
             public long extractAscendingTimestamp(KafkaRecord record)
             {
+                if (record.timestamp == null) {
+                    return 0;
+                }
                 return record.timestamp;
             }
         });
@@ -63,22 +67,20 @@ public class FlinkDataPipeline {
 
         // create a stream to ingest data from Kafka with key/value
         DataStream<KafkaRecord> stream = env.addSource(kafkaConsumer);
-
         stream.filter((record) -> record.value != null && !record.value.isEmpty())
             .keyBy(record -> record.key)
-            .countWindow(ForecastConfig.OutDataLength, ForecastConfig.step)
+            .countWindow(ForecastConfig.Data_Length, ForecastConfig.step)
             .aggregate(new Aggregator())
             .filter((value) -> value != null && !value.isEmpty())
             .addSink(kafkaProducer);
 
-        // produce a number as string every second
-        if (!ForecastConfig.Test.equals("")) {
-            new TestGenerator(p, ForecastConfig.TOPIC_IN, ForecastConfig.Test).start();
-        }
-
 
         // for visual topology of the pipeline. Paste the below output in https://flink.apache.org/visualizer/
         System.out.println( env.getExecutionPlan() );
+
+        if (!ForecastConfig.Test.equals("")) {
+            new TestGenerator(p, ForecastConfig.TOPIC_IN, ForecastConfig.Test).start();
+        }
 
         // start flink
         env.execute();

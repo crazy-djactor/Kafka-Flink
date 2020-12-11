@@ -21,12 +21,13 @@ public class ForecastRecord {
     String value;
 
     List<KafkaRecord> inputMessages;
+
     public ForecastRecord(List<KafkaRecord> inputMessages, LocalDateTime backupTimestamp) {
         this.inputMessages = inputMessages;
         this.backupTimestamp = backupTimestamp;
         this.uuid = UUID.randomUUID();
         List<String> valueArray = new ArrayList<String>();
-
+        String stockID = "";
         for (KafkaRecord record : inputMessages) {
             try {
                 JSONObject jsonObject = new JSONObject(record.value);
@@ -35,11 +36,12 @@ public class ForecastRecord {
                     continue;
                 }
                 valueArray.add(Price);
+                stockID = record.key;
             } catch (JSONException ignored){
             }
         }
-
-        this.value = ForecastPattern.CoreForest(valueArray,
+        
+        this.value = stockID + " " + ForecastPattern.CoreForest(valueArray,
                 ForecastConfig.Pattern_Length,
                 ForecastConfig.Forecast_horizon,
                 ForecastConfig.Precision);

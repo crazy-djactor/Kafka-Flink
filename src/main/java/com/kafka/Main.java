@@ -34,7 +34,8 @@ public class Main
     static int Pattern_Length;
     static int Forecast_horizon;
     static float Precision;
-    static String BOOTSTRAP_SERVER = "localhost:9092";
+//    static String BOOTSTRAP_SERVER = "localhost:9092";
+    static String BOOTSTRAP_SERVER = "45.10.26.123:19092";
 
     @SuppressWarnings("serial")
     public static void Test1() throws Exception {
@@ -249,7 +250,7 @@ public class Main
     }
 
     public static void main( String[] args ) throws Exception {
-        ForecastConfig.Test = "/media/djactor/d0e07426-1a67-4ab9-937f-f4da35c51c14/WORK/Java/DataConvesion/data_JSON.txt";
+        ForecastConfig.Test = "/media/djactor/d0e07426-1a67-4ab9-937f-f4da35c51c14/WORK/Java/DataConvesion/level1.txt";
         StartPipeLine();
 
         Options options = new Options();
@@ -263,9 +264,6 @@ public class Main
         Option data_length = new Option("length", "data_length", true, "DataLength for forecasting, default value is 3000");
         data_length.setRequired(false);
         options.addOption(data_length);
-        Option data_out_length = new Option("output_length", "output_data_length", true, "DataLength for Output stream, default value is 3000");
-        data_out_length.setRequired(false);
-        options.addOption(data_out_length);
 
         Option step = new Option("step", "step", true, "Step value for forecasting, default value is 1");
         step.setRequired(false);
@@ -297,7 +295,6 @@ public class Main
             String inputTopic = cmd.getOptionValue("input");
             String outputTopic = cmd.getOptionValue("output");
             String DataLength = cmd.getOptionValue("data_length");
-            String OutDataLength = cmd.getOptionValue("output_data_length");
             String Step = cmd.getOptionValue("step");
 
             String Precision = cmd.getOptionValue("precision");
@@ -312,10 +309,6 @@ public class Main
             if (DataLength != null) {
                 ForecastConfig.Data_Length = Integer.parseInt(DataLength);
             }
-            if (OutDataLength != null) {
-                ForecastConfig.OutDataLength = Integer.parseInt(OutDataLength);
-            }
-
             if (Forecast_Horizon != null) {
                 ForecastConfig.Forecast_horizon = Integer.parseInt(Forecast_Horizon);
             }

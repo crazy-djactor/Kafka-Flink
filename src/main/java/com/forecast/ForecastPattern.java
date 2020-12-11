@@ -12,6 +12,7 @@ public class ForecastPattern {
     public static String Forecast(String l_Value, long l_HistoryLength, long l_PatternLength, long l_Horizon, double Precision) {
         int i;
         String Price = null;
+        String StockId = null;
         if (l_Value.equals("")) {
             return "No Input Data";
         }
@@ -39,9 +40,14 @@ public class ForecastPattern {
             if (Price.equals("")) {
                 return "No price data";
             }
+            StockId = (String)jsonObject.get("StockID");
+            if (StockId.equals("")) {
+                return "No Stock ID";
+            }
         } catch (JSONException err){
             return err.getMessage();
         }
+
         if (static_Data == null) {
             static_Data = new ArrayList<String>();
             static_Data.add(Price);
@@ -96,6 +102,7 @@ public class ForecastPattern {
                     }
                 }
             }
+
             if (NoOfPositives > 0) {
                 AvgChgPositive = AvgChgPositive / NoOfPositives;
             }

@@ -1,6 +1,7 @@
 package com.kafka;
 
 import com.kafka.connector.Producer;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,8 +37,12 @@ public class TestGenerator extends Thread {
             Thread.sleep(5000);
 
             for (String s : l_ArrAll) {
-                p.send(topic, s);
-                Thread.sleep(1);
+                JSONObject jsonObject = new JSONObject(s);
+                String stockID = (String)jsonObject.get("StockID");
+                if (stockID.equals("")) {
+                    continue;
+                }
+                p.send(topic, s, stockID);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

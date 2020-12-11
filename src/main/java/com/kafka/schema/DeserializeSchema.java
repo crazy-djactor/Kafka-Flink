@@ -19,8 +19,6 @@ public class DeserializeSchema implements KafkaDeserializationSchema<KafkaRecord
         try {
             data.key =  new String(record.key());
             data.value = new String(record.value());
-            System.out.println("deserialize == " + data.key + " " + data.value);
-
             data.timestamp = record.timestamp();
         } catch (Exception e){
         }

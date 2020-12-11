@@ -1,11 +1,18 @@
 package com.forecast;
 
+import com.kafka.model.ForecastRecord;
+import com.kafka.model.KafkaRecord;
+import org.json.JSONObject;
+
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class TestForecast {
@@ -28,7 +35,7 @@ public class TestForecast {
 
         final String dir = System.getProperty("user.dir");
         System.out.println("current dir = " + dir);
-        String inputFile = dir + "/data_JSON.txt";
+        String inputFile = dir + "/level1.txt";
         List<String> l_ArrAll = new ArrayList<String>();
         try (Stream<String> lines = Files.lines(Paths.get(inputFile))) {
             lines.forEach(l_ArrAll::add);
@@ -38,13 +45,49 @@ public class TestForecast {
         }
         String l_Result = null;
         String l_Value = null;
+        Map<String, List<String>> map_records = new HashMap<String, List<String>>();
+        List<String> lst = new ArrayList<String>();
+        int newSize;
         for(int i = 0; i < l_ArrAll.size(); i = i + Step) {
             l_Value = l_ArrAll.get(i);
-            l_Result = ForecastPattern.Forecast(l_Value, Data_Length, Pattern_Length, Forecast_horizon, Precision);
-            if (i >= 3000) {
-                System.out.println(l_Result);
+
+            JSONObject jsonObject = new JSONObject(l_Value);
+            String stockID = (String)jsonObject.get("StockID");
+
+            if (stockID.equals("")) {
+                continue;
+            }
+            String Price = (String)jsonObject.get("price");
+            if (Price.equals("")) {
+                continue;
             }
 
+            if (map_records.containsKey(stockID)) {
+                lst = map_records.get(stockID);
+                lst.add(Price);
+            }
+            else {
+                lst = new ArrayList<String>();
+                lst.add(Price);
+                map_records.put(stockID, lst);
+            }
+
+            if (lst.size() > Data_Length) {
+                newSize = lst.size();
+                lst = lst.subList(newSize - ForecastConfig.Data_Length + 1, newSize);
+            }
+            newSize = lst.size();
+//            if (newSize > ForecastConfig.Pattern_Length){
+                String ret = ForecastPattern.CoreForest(lst,
+                        ForecastConfig.Pattern_Length,
+                        ForecastConfig.Forecast_horizon,
+                        ForecastConfig.Precision);
+                if (! ret.equals(""))
+                {
+                    System.out.println(stockID + " " + ret);
+                }
+
+//            }
         }
     }
 }

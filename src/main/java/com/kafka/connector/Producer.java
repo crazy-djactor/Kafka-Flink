@@ -24,10 +24,10 @@ public class Producer<T>
         producer = new KafkaProducer<String, T>(properties);
     }
 
-    public void send(String topic, T message)
+    public void send(String topic, T message, String key)
     {
         // create a producer record
-        ProducerRecord<String, T> record = new ProducerRecord<String, T>(topic, "myKey", message);
+        ProducerRecord<String, T> record = new ProducerRecord<String, T>(topic, key, message);
 
         // send data - asynchronous
         producer.send(record);
