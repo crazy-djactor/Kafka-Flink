@@ -5,6 +5,7 @@ import java.util.Properties;
 
 import com.forecast.ForecastConfig;
 import com.kafka.connector.Producer;
+import com.kafka.model.ForecastRecord;
 import com.kafka.model.KafkaRecord;
 import com.kafka.operator.Aggregator;
 import com.kafka.schema.DeserializeSchema;
@@ -37,77 +38,6 @@ public class Main
 //    static String BOOTSTRAP_SERVER = "localhost:9092";
     static String BOOTSTRAP_SERVER = "45.10.26.123:19092";
 
-    @SuppressWarnings("serial")
-    public static void Test1() throws Exception {
-        String TOPIC_IN = "Topic1-IN";
-        String TOPIC_OUT = "Topic3-OUT";
-
-
-        Producer<String> p = new Producer<String>(BOOTSTRAP_SERVER, StringSerializer.class.getName());
-
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
-        Properties props = new Properties();
-        props.put("bootstrap.servers", BOOTSTRAP_SERVER);
-        props.put("client.id", "flink-example1");
-
-        // Reading data directly as <Key, Value> from Kafka. Write an inner class containing key, value
-        // and use it to deserialise Kafka record.
-        // Reference => https://stackoverflow.com/questions/53324676/how-to-use-flinkkafkaconsumer-to-parse-key-separately-k-v-instead-of-t
-        FlinkKafkaConsumer<KafkaRecord> kafkaConsumer = new FlinkKafkaConsumer<>(TOPIC_IN, new DeserializeSchema(), props);
-
-        Properties prodProps = new Properties();
-        prodProps.put("bootstrap.servers", BOOTSTRAP_SERVER);
-        FlinkKafkaProducer<String> kafkaProducer =
-                new FlinkKafkaProducer<String>(ForecastConfig.TOPIC_OUT,
-                        ((value, timestamp) -> new ProducerRecord<byte[], byte[]>(ForecastConfig.TOPIC_OUT,
-                                "myKey".getBytes(), value.getBytes())),
-                        prodProps,
-                        FlinkKafkaProducer.Semantic.EXACTLY_ONCE);
-
-        kafkaConsumer.setStartFromEarliest();
-
-        Data_Length = 5;
-        step = 1;
-        Pattern_Length = 10;
-        Forecast_horizon = 5;
-        Precision = 0.95f;
-
-        // create a stream to ingest data from Kafka as a custom class with explicit key/value
-        DataStream<KafkaRecord> stream = env.addSource(kafkaConsumer);
-
-        // supports timewindow without group by key
-        stream
-                .countWindowAll(10, 1)
-                .aggregate(new Aggregator())
-                .addSink(kafkaProducer);
-//                .reduce(new ReduceFunction<KafkaRecord>()
-//                {
-//                    KafkaRecord result = new KafkaRecord();
-//
-//                    @Override
-//                    public KafkaRecord reduce(KafkaRecord record1, KafkaRecord record2) throws Exception
-//                    {
-//                        System.out.println(LocalTime.now() + " -> " + record1 + "   " + record2);
-//                        result.key = record1.key;
-//                        result.value = record1.value + " " + record2.value;
-//                        return result;
-//                    }
-//                }).addSink(kafkaProducer); // immediate printing to console
-
-
-        //.keyBy( (KeySelector<KafkaRecord, String>) KafkaRecord::getKey )
-        //.timeWindow(Time.seconds(5))
-
-        // produce a number as string every second
-        new TestGenerator(p, TOPIC_IN, "/media/djactor/d0e07426-1a67-4ab9-937f-f4da35c51c14/WORK/Java/Kafka-Flink/data_JSON.txt").start();
-
-        // for visual topology of the pipeline. Paste the below output in https://flink.apache.org/visualizer/
-        System.out.println( env.getExecutionPlan() );
-
-        // start flink
-        env.execute();
-    }
 
     @SuppressWarnings("serial")
     public static void Test2( String[] args ) throws Exception
@@ -347,6 +277,5 @@ public class Main
             formatter.printHelp("utility-name", options);
             System.exit(1);
         }
-
     }
 }

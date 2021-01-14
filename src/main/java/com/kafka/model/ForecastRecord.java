@@ -19,6 +19,8 @@ public class ForecastRecord {
     UUID uuid;
     @JsonProperty("value")
     String value;
+    @JsonProperty("key")
+    String key;
 
     List<KafkaRecord> inputMessages;
 
@@ -35,17 +37,19 @@ public class ForecastRecord {
                 if (Price.equals("")) {
                     continue;
                 }
+                stockID =  (String)jsonObject.get("StockID");
+                if (stockID.equals("")) {
+                    continue;
+                }
                 valueArray.add(Price);
-                stockID = record.key;
             } catch (JSONException ignored){
             }
         }
-        
-        this.value = stockID + " " + ForecastPattern.CoreForest(valueArray,
+        this.value = ForecastPattern.CoreForest(valueArray,
                 ForecastConfig.Pattern_Length,
                 ForecastConfig.Forecast_horizon,
                 ForecastConfig.Precision);
-
+        this.key = stockID;
 //        this.value = ForecastPattern.Forecast(valueArray, ForecastConfig.Pattern_Length,
 //                ForecastConfig.Forecast_horizon, ForecastConfig.Precision);
     }
@@ -54,4 +58,5 @@ public class ForecastRecord {
         return inputMessages;
     }
     public String getValue() {return value; }
+    public String getKey() {return key; }
 }

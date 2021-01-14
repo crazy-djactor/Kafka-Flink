@@ -43,6 +43,7 @@ public class TestGenerator extends Thread {
                     continue;
                 }
                 p.send(topic, s, stockID);
+//                p.send(topic, s, "forecast");
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

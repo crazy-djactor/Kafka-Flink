@@ -1,9 +1,12 @@
 package com.kafka;
 
 import com.kafka.connector.Producer;
+import com.kafka.model.ForecastRecord;
 import com.kafka.model.KafkaRecord;
 import com.kafka.operator.Aggregator;
 import com.kafka.schema.DeserializeSchema;
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -27,7 +30,7 @@ public class FlinkDataPipeline {
         // produce a number as string every second
 
         // to use allowed lateness
-        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+//        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
         Properties props = new Properties();
         props.put("bootstrap.servers", ForecastConfig.BOOTSTRAP_SERVER);
@@ -56,22 +59,34 @@ public class FlinkDataPipeline {
         Properties prodProps = new Properties();
         prodProps.put("bootstrap.servers", ForecastConfig.BOOTSTRAP_SERVER);
 
-        FlinkKafkaProducer<String> kafkaProducer =
-                new FlinkKafkaProducer<String>(ForecastConfig.TOPIC_OUT,
+        FlinkKafkaProducer<ForecastRecord> kafkaProducer =
+                new FlinkKafkaProducer<>(ForecastConfig.TOPIC_OUT,
                         ((value, timestamp) ->
-                             new ProducerRecord<byte[], byte[]>(ForecastConfig.TOPIC_OUT, "myKey".getBytes(),
-                                    value.getBytes())
-                            ),
+                                new ProducerRecord<byte[], byte[]>(
+                                        ForecastConfig.TOPIC_OUT, value.getKey().getBytes(), value.getValue().getBytes())
+                        ),
                         prodProps,
                         FlinkKafkaProducer.Semantic.EXACTLY_ONCE);
 
         // create a stream to ingest data from Kafka with key/value
         DataStream<KafkaRecord> stream = env.addSource(kafkaConsumer);
         stream.filter((record) -> record.value != null && !record.value.isEmpty())
-            .keyBy(record -> record.key)
+            .keyBy(new KeySelector<KafkaRecord, String>() {
+                @Override
+                public String getKey(KafkaRecord kfRecord){
+                    return kfRecord.key;
+                }
+            })
             .countWindow(ForecastConfig.Data_Length, ForecastConfig.step)
             .aggregate(new Aggregator())
-            .filter((value) -> value != null && !value.isEmpty())
+            .filter(new FilterFunction<ForecastRecord>() {
+                @Override
+                public boolean filter(ForecastRecord resultRecord) throws Exception {
+                    return resultRecord.getKey() != null &&
+                            ! resultRecord.getKey().isEmpty() &&
+                            resultRecord.getValue() != null && !resultRecord.getValue().isEmpty();
+                }
+            })
             .addSink(kafkaProducer);
 
 
