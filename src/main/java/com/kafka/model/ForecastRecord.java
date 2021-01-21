@@ -45,11 +45,19 @@ public class ForecastRecord {
             } catch (JSONException ignored){
             }
         }
-        this.value = ForecastPattern.CoreForest(valueArray,
+
+        JSONObject result = ForecastPattern.CoreForest(valueArray,
                 ForecastConfig.Pattern_Length,
                 ForecastConfig.Forecast_horizon,
                 ForecastConfig.Precision);
         this.key = stockID;
+        if (result != null) {
+            result.put("StockID", stockID);
+            this.value = result.toString();
+        }
+        else {
+            this.value = "";
+        }
 //        this.value = ForecastPattern.Forecast(valueArray, ForecastConfig.Pattern_Length,
 //                ForecastConfig.Forecast_horizon, ForecastConfig.Precision);
     }

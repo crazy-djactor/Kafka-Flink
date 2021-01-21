@@ -9,26 +9,31 @@ public class ForecastPattern {
     static List<String> static_Data = null;
     static long HistorySize = 0;
 
-    public static String Forecast(String l_Value, long l_HistoryLength, long l_PatternLength, long l_Horizon, double Precision) {
+    public static JSONObject Forecast(String l_Value, long l_HistoryLength, long l_PatternLength, long l_Horizon, double Precision) {
         int i;
         String Price = null;
         String StockId = null;
         if (l_Value.equals("")) {
-            return "No Input Data";
+//            "No Input Data";
+            return null;
         }
         if (l_PatternLength < 2) {
-            return "Pattern Length must be bigger than 1";
+//            "Pattern Length must be bigger than 1";
+            return null;
         }
         if (l_Horizon < 1) {
-            return "Horizon must be bigger than 0";
+//            "Horizon must be bigger than 0";
+            return null;
         }
         if (Precision < 0 || Precision > 1) {
-            return "Precision needs to be between 0 and 1";
+//            "Precision needs to be between 0 and 1";
+            return null;
         }
 
         if (HistorySize == 0) {
             if (l_HistoryLength <= 0) {
-                return "HistoryLength must be bigger than 0";
+//                 "HistoryLength must be bigger than 0";
+                return null;
             } else {
                 HistorySize = l_HistoryLength;
             }
@@ -38,14 +43,17 @@ public class ForecastPattern {
             JSONObject jsonObject = new JSONObject(l_Value);
             Price = (String)jsonObject.get("price");
             if (Price.equals("")) {
-                return "No price data";
+//                "No price data";
+                return null;
             }
             StockId = (String)jsonObject.get("StockID");
             if (StockId.equals("")) {
-                return "No Stock ID";
+//                "No Stock ID";
+                return null;
             }
         } catch (JSONException err){
-            return err.getMessage();
+//            err.getMessage();
+            return null;
         }
 
         if (static_Data == null) {
@@ -66,7 +74,7 @@ public class ForecastPattern {
         return CoreForest(static_Data, l_PatternLength, l_Horizon, Precision);
     }
 
-    public static String CoreForest(List<String> Data, long l_PatternLength, long l_Horizon, double Precision) {
+    public static JSONObject CoreForest(List<String> Data, long l_PatternLength, long l_Horizon, double Precision) {
         int UBoundData = Data.size() - 1;
         int i;
         String[] arrayData = Data.toArray(new String[UBoundData + 1]);
@@ -114,14 +122,23 @@ public class ForecastPattern {
             DecimalFormat df2 = new DecimalFormat("0.00");
             DecimalFormat df4 = new DecimalFormat("0.0000");
             if (NoOfAll == 0)
-                return "";
-            return String.format("%d; %s; %s; %s; %s", NoOfAll,
-                    df2.format((float) (NoOfPositives) / NoOfAll * 100),
-                    df2.format((float) (NoOfNegatives) / NoOfAll * 100),
-                    df4.format(AvgChgPositive),
-                    df4.format(AvgChgNegative));
+                return null;
+            JSONObject res = new JSONObject();
+//            "StockID": "ForexEURHUFNoExpiry",
+//                    "NoOfPattern":"37","NoOfPos":"45.95","NoOfNeg":"54.95","AvgChgPos":"0.3373","AvgChgNeg":"0.1803"
+            res.put("NoOfPattern", Integer.toString(NoOfAll));
+            res.put("NoOfPos", df2.format(Float.valueOf((float)(NoOfPositives) / NoOfAll * 100)));
+            res.put("NoOfNeg", df2.format(Float.valueOf((float) (NoOfNegatives) / NoOfAll * 100)));
+            res.put("AvgChgPos", df2.format(Float.valueOf(AvgChgPositive)));
+            res.put("AvgChgNeg", df2.format(Float.valueOf(AvgChgNegative)));
+            return res;
+//            return String.format("%d; %s; %s; %s; %s", NoOfAll,
+//                    df2.format((float) (NoOfPositives) / NoOfAll * 100),
+//                    df2.format((float) (NoOfNegatives) / NoOfAll * 100),
+//                    df4.format(AvgChgPositive),
+//                    df4.format(AvgChgNegative));
         }
-        return "";
+        return null;
     }
 
     public static double PearsonCorrelation(float[] X, float[] Y) {

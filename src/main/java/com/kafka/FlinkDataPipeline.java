@@ -14,11 +14,14 @@ import org.apache.flink.streaming.api.functions.timestamps.AscendingTimestampExt
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
+import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
 import com.forecast.ForecastConfig;
+
+import javax.annotation.Nullable;
 
 public class FlinkDataPipeline {
 
@@ -61,10 +64,15 @@ public class FlinkDataPipeline {
 
         FlinkKafkaProducer<ForecastRecord> kafkaProducer =
                 new FlinkKafkaProducer<>(ForecastConfig.TOPIC_OUT,
-                        ((value, timestamp) ->
-                                new ProducerRecord<byte[], byte[]>(
-                                        ForecastConfig.TOPIC_OUT, value.getKey().getBytes(), value.getValue().getBytes())
-                        ),
+                        (new KafkaSerializationSchema<ForecastRecord>() {
+                            @Override
+                            public ProducerRecord<byte[], byte[]> serialize(ForecastRecord element, @Nullable Long timestamp) {
+                                String key = element.getKey();
+                                String value = element.getValue();
+                                return new ProducerRecord<byte[], byte[]>(
+                                                ForecastConfig.TOPIC_OUT, key.getBytes(), value.getBytes());
+                            }
+                        }),
                         prodProps,
                         FlinkKafkaProducer.Semantic.EXACTLY_ONCE);
 

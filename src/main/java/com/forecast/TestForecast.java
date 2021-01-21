@@ -78,11 +78,11 @@ public class TestForecast {
             }
             newSize = lst.size();
 //            if (newSize > ForecastConfig.Pattern_Length){
-                String ret = ForecastPattern.CoreForest(lst,
+                JSONObject ret = ForecastPattern.CoreForest(lst,
                         ForecastConfig.Pattern_Length,
                         ForecastConfig.Forecast_horizon,
                         ForecastConfig.Precision);
-                if (! ret.equals(""))
+                if (ret != null)
                 {
                     System.out.println(stockID + " " + ret);
                 }

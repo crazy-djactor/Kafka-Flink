@@ -72,11 +72,7 @@ public class Aggregator implements AggregateFunction<KafkaRecord, List<KafkaReco
     @Override
     public ForecastRecord getResult(List<KafkaRecord> inputMessages) {
         List<KafkaRecord> inputData = new ArrayList<>(inputMessages);
-        ForecastRecord result = new ForecastRecord(inputData, LocalDateTime.now());
-        if (!result.getKey().isEmpty()) {
-            System.out.println(result.getValue());
-        }
-        return result;
+        return new ForecastRecord(inputData, LocalDateTime.now());
     }
 
     @Override
