@@ -235,7 +235,7 @@ public class Main
 
             ForecastConfig.TOPIC_IN = inputTopic;
             ForecastConfig.TOPIC_OUT = outputTopic;
-
+            System.out.println(ForecastConfig.TOPIC_IN);
             if (DataLength != null) {
                 ForecastConfig.Data_Length = Integer.parseInt(DataLength);
             }

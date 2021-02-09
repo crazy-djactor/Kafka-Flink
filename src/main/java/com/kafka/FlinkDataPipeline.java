@@ -40,6 +40,8 @@ public class FlinkDataPipeline {
         props.put("client.id", "flink-example3");
 
         // consumer to get both key/values per Topic
+        System.out.println("In Topic: " + ForecastConfig.TOPIC_IN);
+
         FlinkKafkaConsumer<KafkaRecord> kafkaConsumer = new FlinkKafkaConsumer<>(ForecastConfig.TOPIC_IN,
                 new DeserializeSchema(), props);
 
@@ -61,6 +63,8 @@ public class FlinkDataPipeline {
         // Create Kafka producer from Flink API
         Properties prodProps = new Properties();
         prodProps.put("bootstrap.servers", ForecastConfig.BOOTSTRAP_SERVER);
+
+        System.out.println("Out Topic: " + ForecastConfig.TOPIC_OUT);
 
         FlinkKafkaProducer<ForecastRecord> kafkaProducer =
                 new FlinkKafkaProducer<>(ForecastConfig.TOPIC_OUT,
