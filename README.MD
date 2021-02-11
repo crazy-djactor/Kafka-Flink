@@ -158,5 +158,27 @@ This configuration is processing json inputs from Topic1-IN and process, write o
  To check output for kafka topic, let's run console consumer of output topic.
   
   - bin/kafka-console-consumer.sh --topic Topic3-OUT --from-beginning --bootstrap-server localhost:9092
- 
- 
+
+
+curl -X POST -H "Content-Type: application/json" --data '
+{
+    "programArgsList": [
+      "--input",
+      "Topic1-IN",
+      "--output",
+      "Topic3-OUT",
+      "--data_length",
+      "200",
+      "--step",
+      "1",
+      "--pattern_length",
+      "5",
+      "--forcast_horizon",
+      "200",
+      "--precision",
+      "0.7",
+      "--bootstrap-server",
+      "45.10.26.123:19092"
+    ]
+}
+' http://localhost:8081/jars/9c31c199-5f28-4c69-af7e-06b0cd393ea7_DataConvesion.jar/run

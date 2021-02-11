@@ -18,10 +18,13 @@ import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
+import java.io.FileWriter;
 import java.util.Properties;
 import com.forecast.ForecastConfig;
 
 import javax.annotation.Nullable;
+import java.io.File;  // Import the File class
+import java.io.IOException;
 
 public class FlinkDataPipeline {
 
@@ -41,6 +44,7 @@ public class FlinkDataPipeline {
 
         // consumer to get both key/values per Topic
         System.out.println("In Topic: " + ForecastConfig.TOPIC_IN);
+
 
         FlinkKafkaConsumer<KafkaRecord> kafkaConsumer = new FlinkKafkaConsumer<>(ForecastConfig.TOPIC_IN,
                 new DeserializeSchema(), props);

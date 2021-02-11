@@ -1,5 +1,8 @@
 package com.kafka;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalTime;
 import java.util.Properties;
 
@@ -13,6 +16,7 @@ import com.kafka.schema.DeserializeSchema;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -262,6 +266,22 @@ public class Main
             if (Test != null) {
                 ForecastConfig.Test = Test;
             }
+
+
+//            try {
+//                File myObj = new File("/home/djactor/Documents/InTopic.txt");
+//                if (myObj.createNewFile()) {
+//                    System.out.println("File created: " + myObj.getName());
+//                } else {
+//                    System.out.println("File already exists.");
+//                }
+//                FileWriter myWriter = new FileWriter("/home/djactor/Documents/InTopic.txt");
+//                myWriter.write(ForecastConfig.TOPIC_IN);
+//                myWriter.close();
+//            } catch (IOException e) {
+//                System.out.println("An error occurred.");
+//                e.printStackTrace();
+//            }
 
             String outputString = String.format("Forecasting from Topic %s to %s with (DataLength: %d, Forecast_Horizon: %d, PatternLength: %d, Step: %d, Precision: %.2f",
                     inputTopic, outputTopic,
