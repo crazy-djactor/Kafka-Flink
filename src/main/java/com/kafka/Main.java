@@ -42,7 +42,6 @@ public class Main
 //    static String BOOTSTRAP_SERVER = "localhost:9092";
     static String BOOTSTRAP_SERVER = "45.10.26.123:19092";
 
-
     @SuppressWarnings("serial")
     public static void Test2( String[] args ) throws Exception
     {
@@ -203,21 +202,21 @@ public class Main
         step.setRequired(false);
         options.addOption(step);
         Option patternLength = new Option("pl", "pattern_length", true, "Pattern Length for forecasting, default value is 10");
-        data_length.setRequired(false);
+        patternLength.setRequired(false);
         options.addOption(patternLength);
         Option forecast = new Option("fh", "forcast_horizon", true, "Horizon value for forecasting, default value is 5");
         forecast.setRequired(false);
         options.addOption(forecast);
         Option precision = new Option("pr", "precision", true, "Precision value for forecasting, default value is 0.95f");
-        forecast.setRequired(false);
+        precision.setRequired(false);
         options.addOption(precision);
 
         Option bootstrap = new Option("bst", "bootstrap-server", true, "Bootstrap server for kafka, default value is localhost:9092");
-        forecast.setRequired(false);
+        bootstrap.setRequired(false);
         options.addOption(bootstrap);
 
         Option test = new Option("test", "test", true, "Test data for test running, ex: C:/data_JSON.txt");
-        forecast.setRequired(false);
+        test.setRequired(false);
         options.addOption(test);
 
         CommandLineParser parser = new DefaultParser();
@@ -267,24 +266,9 @@ public class Main
                 ForecastConfig.Test = Test;
             }
 
-
-//            try {
-//                File myObj = new File("/home/djactor/Documents/InTopic.txt");
-//                if (myObj.createNewFile()) {
-//                    System.out.println("File created: " + myObj.getName());
-//                } else {
-//                    System.out.println("File already exists.");
-//                }
-//                FileWriter myWriter = new FileWriter("/home/djactor/Documents/InTopic.txt");
-//                myWriter.write(ForecastConfig.TOPIC_IN);
-//                myWriter.close();
-//            } catch (IOException e) {
-//                System.out.println("An error occurred.");
-//                e.printStackTrace();
-//            }
-
             String outputString = String.format("Forecasting from Topic %s to %s with (DataLength: %d, Forecast_Horizon: %d, PatternLength: %d, Step: %d, Precision: %.2f",
-                    inputTopic, outputTopic,
+                    ForecastConfig.TOPIC_IN,
+                    ForecastConfig.TOPIC_OUT,
                     ForecastConfig.Data_Length,
                     ForecastConfig.Forecast_horizon,
                     ForecastConfig.Pattern_Length,

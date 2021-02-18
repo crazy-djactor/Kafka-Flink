@@ -24,8 +24,6 @@ public class TestGenerator extends Thread {
 
     @Override
     public void run() {
-
-        final String dir = System.getProperty("user.dir");
         System.out.println("input dir = " + this.test);
         List<String> l_ArrAll = new ArrayList<String>();
         try (Stream<String> lines = Files.lines(Paths.get(this.test))) {
@@ -42,21 +40,11 @@ public class TestGenerator extends Thread {
                 if (stockID.equals("")) {
                     continue;
                 }
-                p.send(topic, s, stockID);
+                p.send(this.topic, s, stockID);
 //                p.send(topic, s, "forecast");
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//            int counter = 0;
-//            while (++ counter > 0) {
-//                p.send(topic, "[" + counter + "]");
-//
-//                try {
-//                    Thread.sleep( 5);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
     }
 }

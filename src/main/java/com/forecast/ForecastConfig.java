@@ -9,9 +9,11 @@ public class ForecastConfig {
 
 //    static public String TOPIC_IN = "Topic1-IN";
 //    static public String TOPIC_OUT = "Topic3-OUT";
-//    static public String BOOTSTRAP_SERVER = "192.168.2.169:9092";
+//    static public String BOOTSTRAP_SERVER = "192.168.2.144:9092";
     static public String TOPIC_IN = "inSpring";
     static public String TOPIC_OUT = "outSpring";
     static public String BOOTSTRAP_SERVER = "45.10.26.123:39092";
     static public String Test = "";
 }
+
+

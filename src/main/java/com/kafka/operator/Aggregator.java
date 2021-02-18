@@ -1,5 +1,6 @@
 package com.kafka.operator;
 
+import com.forecast.ForecastConfig;
 import com.kafka.model.KafkaRecord;
 import com.kafka.model.ForecastRecord;
 import org.apache.flink.api.common.functions.AggregateFunction;

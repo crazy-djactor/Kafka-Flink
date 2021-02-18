@@ -1,0 +1,42 @@
+version: '3.6'
+
+networks:
+  bridge:
+    driver: bridge
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      bridge:
+        aliases:
+          - zookeeper
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ADVERTISED_HOST_NAME: 0.0.0.0
+      KAFKA_ZOOKEEPER_CONNECT: 45.10.26.123:58081
+      #KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://45.10.26.123:39092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      JMX_PORT: 9999
+    networks:
+      bridge:
+        aliases:
+          - kafka
+
+  kafka-manager:
+    image: sheepkiller/kafka-manager:latest
+    environment:
+      ZK_HOSTS: "45.10.26.123:58081"
+    ports:
+      - 9000:9000
+    networks:
+      - bridge

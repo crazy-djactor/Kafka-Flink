@@ -18,19 +18,14 @@ import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
-import java.io.FileWriter;
 import java.util.Properties;
 import com.forecast.ForecastConfig;
 
 import javax.annotation.Nullable;
-import java.io.File;  // Import the File class
-import java.io.IOException;
 
 public class FlinkDataPipeline {
 
-    @SuppressWarnings("serial")
     public static void StartPipeLine() throws Exception {
-        Producer<String> p = new Producer<String>(ForecastConfig.BOOTSTRAP_SERVER, StringSerializer.class.getName());
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         // produce a number as string every second
@@ -38,15 +33,16 @@ public class FlinkDataPipeline {
         // to use allowed lateness
 //        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
-        Properties props = new Properties();
+        final Properties props = new Properties();
         props.put("bootstrap.servers", ForecastConfig.BOOTSTRAP_SERVER);
-        props.put("client.id", "flink-example3");
-
+        props.put("client.id", "flink-start-pipeline");
+        props.put("topic.name.in", ForecastConfig.TOPIC_IN);
+        props.put("topic.name.out", ForecastConfig.TOPIC_OUT);
         // consumer to get both key/values per Topic
         System.out.println("In Topic: " + ForecastConfig.TOPIC_IN);
 
 
-        FlinkKafkaConsumer<KafkaRecord> kafkaConsumer = new FlinkKafkaConsumer<>(ForecastConfig.TOPIC_IN,
+        FlinkKafkaConsumer<KafkaRecord> kafkaConsumer = new FlinkKafkaConsumer<>(props.getProperty("topic.name.in"),
                 new DeserializeSchema(), props);
 
         // for allowing Flink to handle late elements
@@ -65,9 +61,6 @@ public class FlinkDataPipeline {
         kafkaConsumer.setStartFromLatest();
 
         // Create Kafka producer from Flink API
-        Properties prodProps = new Properties();
-        prodProps.put("bootstrap.servers", ForecastConfig.BOOTSTRAP_SERVER);
-
         System.out.println("Out Topic: " + ForecastConfig.TOPIC_OUT);
 
         FlinkKafkaProducer<ForecastRecord> kafkaProducer =
@@ -78,10 +71,11 @@ public class FlinkDataPipeline {
                                 String key = element.getKey();
                                 String value = element.getValue();
                                 return new ProducerRecord<byte[], byte[]>(
-                                                ForecastConfig.TOPIC_OUT, key.getBytes(), value.getBytes());
+                                        props.getProperty("topic.name.out"), key.getBytes(), value.getBytes());
                             }
+
                         }),
-                        prodProps,
+                        props,
                         FlinkKafkaProducer.Semantic.EXACTLY_ONCE);
 
         // create a stream to ingest data from Kafka with key/value
@@ -108,10 +102,11 @@ public class FlinkDataPipeline {
 
         // for visual topology of the pipeline. Paste the below output in https://flink.apache.org/visualizer/
         System.out.println( env.getExecutionPlan() );
-
-        if (!ForecastConfig.Test.equals("")) {
-            new TestGenerator(p, ForecastConfig.TOPIC_IN, ForecastConfig.Test).start();
-        }
+//        ForecastConfig.Test = "/home/djactor/Documents/data_JSON.txt";
+//        if (!ForecastConfig.Test.equals("")) {
+//            Producer<String> outputProducer = new Producer<String>(ForecastConfig.BOOTSTRAP_SERVER, StringSerializer.class.getName());
+//            new TestGenerator(outputProducer, props.getProperty("topic.name.in"), ForecastConfig.Test).start();
+//        }
 
         // start flink
         env.execute();

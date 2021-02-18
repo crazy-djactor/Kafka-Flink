@@ -182,3 +182,26 @@ curl -X POST -H "Content-Type: application/json" --data '
     ]
 }
 ' http://localhost:8081/jars/9c31c199-5f28-4c69-af7e-06b0cd393ea7_DataConvesion.jar/run
+
+curl -X POST -H "Content-Type: application/json" --data '
+{
+"programArgsList": [
+  "--input",
+  "Topic1-IN",
+  "--output",
+  "Topic3-OUT",
+  "--data_length",
+  "200",
+  "--step",
+  "1",
+  "--pattern_length",
+  "5",
+  "--forcast_horizon",
+  "200",
+  "--precision",
+  "0.7",
+  "--bootstrap-server",
+  "localhost:9092"
+  ]
+}
+' http://localhost:8081/jars/bd48a505-4a32-456a-b2d5-691e4b5938dc_DataConvesion.jar/run

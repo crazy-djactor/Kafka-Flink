@@ -30,64 +30,64 @@ public class TestForecast {
         Precision = _Precision;
     }
     public void Test() {
-        URL location = ForecastPattern.class.getProtectionDomain().getCodeSource().getLocation();
-        System.out.println(location.getFile());
-
-        final String dir = System.getProperty("user.dir");
-        System.out.println("current dir = " + dir);
-        String inputFile = dir + "/level1.txt";
-        List<String> l_ArrAll = new ArrayList<String>();
-        try (Stream<String> lines = Files.lines(Paths.get(inputFile))) {
-            lines.forEach(l_ArrAll::add);
-        }
-        catch(IOException e){
-            System.out.println(e);
-        }
-        String l_Result = null;
-        String l_Value = null;
-        Map<String, List<String>> map_records = new HashMap<String, List<String>>();
-        List<String> lst = new ArrayList<String>();
-        int newSize;
-        for(int i = 0; i < l_ArrAll.size(); i = i + Step) {
-            l_Value = l_ArrAll.get(i);
-
-            JSONObject jsonObject = new JSONObject(l_Value);
-            String stockID = (String)jsonObject.get("StockID");
-
-            if (stockID.equals("")) {
-                continue;
-            }
-            String Price = (String)jsonObject.get("price");
-            if (Price.equals("")) {
-                continue;
-            }
-
-            if (map_records.containsKey(stockID)) {
-                lst = map_records.get(stockID);
-                lst.add(Price);
-            }
-            else {
-                lst = new ArrayList<String>();
-                lst.add(Price);
-                map_records.put(stockID, lst);
-            }
-
-            if (lst.size() > Data_Length) {
-                newSize = lst.size();
-                lst = lst.subList(newSize - ForecastConfig.Data_Length + 1, newSize);
-            }
-            newSize = lst.size();
-//            if (newSize > ForecastConfig.Pattern_Length){
-                JSONObject ret = ForecastPattern.CoreForest(lst,
-                        ForecastConfig.Pattern_Length,
-                        ForecastConfig.Forecast_horizon,
-                        ForecastConfig.Precision);
-                if (ret != null)
-                {
-                    System.out.println(stockID + " " + ret);
-                }
-
+//        URL location = ForecastPattern.class.getProtectionDomain().getCodeSource().getLocation();
+//        System.out.println(location.getFile());
+//
+//        final String dir = System.getProperty("user.dir");
+//        System.out.println("current dir = " + dir);
+//        String inputFile = dir + "/level1.txt";
+//        List<String> l_ArrAll = new ArrayList<String>();
+//        try (Stream<String> lines = Files.lines(Paths.get(inputFile))) {
+//            lines.forEach(l_ArrAll::add);
+//        }
+//        catch(IOException e){
+//            System.out.println(e);
+//        }
+//        String l_Result = null;
+//        String l_Value = null;
+//        Map<String, List<String>> map_records = new HashMap<String, List<String>>();
+//        List<String> lst = new ArrayList<String>();
+//        int newSize;
+//        for(int i = 0; i < l_ArrAll.size(); i = i + Step) {
+//            l_Value = l_ArrAll.get(i);
+//
+//            JSONObject jsonObject = new JSONObject(l_Value);
+//            String stockID = (String)jsonObject.get("StockID");
+//
+//            if (stockID.equals("")) {
+//                continue;
 //            }
-        }
+//            String Price = (String)jsonObject.get("price");
+//            if (Price.equals("")) {
+//                continue;
+//            }
+//
+//            if (map_records.containsKey(stockID)) {
+//                lst = map_records.get(stockID);
+//                lst.add(Price);
+//            }
+//            else {
+//                lst = new ArrayList<String>();
+//                lst.add(Price);
+//                map_records.put(stockID, lst);
+//            }
+//
+//            if (lst.size() > Data_Length) {
+//                newSize = lst.size();
+//                lst = lst.subList(newSize - ForecastConfig.Data_Length + 1, newSize);
+//            }
+//            newSize = lst.size();
+////            if (newSize > ForecastConfig.Pattern_Length){
+//                JSONObject ret = ForecastPattern.CoreForest(lst,
+//                        ForecastConfig.Pattern_Length,
+//                        ForecastConfig.Forecast_horizon,
+//                        ForecastConfig.Precision);
+//                if (ret != null)
+//                {
+//                    System.out.println(stockID + " " + ret);
+//                }
+//
+////            }
+//        }
     }
 }
