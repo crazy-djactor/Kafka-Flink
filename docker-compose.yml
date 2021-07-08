@@ -35,7 +35,7 @@ services:
   kafka-manager:
     image: sheepkiller/kafka-manager:latest
     environment:
-      ZK_HOSTS: "45.10.26.123:58081"
+      ZK_HOSTS: "45.10.26.123:28081"
     ports:
       - 9000:9000
     networks:

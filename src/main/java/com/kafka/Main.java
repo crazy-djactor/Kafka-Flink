@@ -1,22 +1,16 @@
 package com.kafka;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.time.LocalTime;
 import java.util.Properties;
 
 import com.forecast.ForecastConfig;
 import com.kafka.connector.Producer;
-import com.kafka.model.ForecastRecord;
 import com.kafka.model.KafkaRecord;
-import com.kafka.operator.Aggregator;
 import com.kafka.schema.DeserializeSchema;
 
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -30,7 +24,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.commons.cli.*;
 
 import static com.kafka.FlinkDataPipeline.StartPipeLine;
-
 
 public class Main
 {
