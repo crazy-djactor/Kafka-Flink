@@ -129,8 +129,8 @@ public class ForecastPattern {
             res.put("NoOfPattern", Integer.toString(NoOfAll));
             res.put("NoOfPos", df2.format(Float.valueOf((float)(NoOfPositives) / NoOfAll * 100)));
             res.put("NoOfNeg", df2.format(Float.valueOf((float) (NoOfNegatives) / NoOfAll * 100)));
-            res.put("AvgChgPos", df2.format(Float.valueOf(AvgChgPositive)));
-            res.put("AvgChgNeg", df2.format(Float.valueOf(AvgChgNegative)));
+            res.put("AvgChgPos", df4.format(Float.valueOf(AvgChgPositive)));
+            res.put("AvgChgNeg", df4.format(Float.valueOf(AvgChgNegative)));
             return res;
 //            return String.format("%d; %s; %s; %s; %s", NoOfAll,
 //                    df2.format((float) (NoOfPositives) / NoOfAll * 100),
